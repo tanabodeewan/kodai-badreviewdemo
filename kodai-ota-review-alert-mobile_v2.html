@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kodai - OTA Review Alert Demo (Mobile)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    :root {
+      --bg: #f5f4f1;
+      --card: #ffffff;
+      --text: #171717;
+      --muted: #68645e;
+      --faint: #908c84;
+      --border: rgba(0, 0, 0, 0.08);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --red: #d63a31;
+      --green: #06c755;
+      --amber: #c47f00;
+      --purple: #6c5ce7;
+      --booking: #003580;
+      --agoda: #e8373b;
+      --radius: 8px;
+      --mono: "DM Mono", monospace;
+      --sans: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: var(--bg);
+      font-family: var(--sans);
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 96px 0 48px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--border);
+      background: rgba(245, 244, 241, 0.76);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .topbar-inner {
+      width: min(1120px, calc(100% - 32px));
+      height: 64px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      color: var(--red);
+    }
+
+    .live-badge,
+    .eyebrow,
+    .status-line,
+    .meta,
+    .sender,
+    .timestamp,
+    .footer {
+      font-family: var(--mono);
+      letter-spacing: 0;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(6, 199, 85, 0.42);
+      animation: pulse 1.7s ease-out infinite;
+      flex: 0 0 auto;
+    }
+
+    .fade-up {
+      animation: fadeUp 720ms ease both;
+    }
+
+    .delay-1 {
+      animation-delay: 90ms;
+    }
+
+    .delay-2 {
+      animation-delay: 180ms;
+    }
+
+    .delay-3 {
+      animation-delay: 270ms;
+    }
+
+    .hero {
+      max-width: 620px;
+      margin: 0 auto 48px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 6vw, 68px);
+      line-height: 0.96;
+      font-weight: 300;
+      letter-spacing: 0;
+    }
+
+    h1 strong {
+      font-weight: 500;
+    }
+
+    .subtitle {
+      margin: 18px auto 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.62;
+      font-weight: 300;
+    }
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0 0 12px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .platform-card {
+      padding: 18px;
+    }
+
+    .platform-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .platform-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    .platform-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .platform-icon.booking {
+      background: var(--booking);
+    }
+
+    .platform-icon.agoda {
+      background: var(--agoda);
+    }
+
+    .review-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .review {
+      padding: 13px 13px 13px 14px;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--green);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .review.bad {
+      border-left-color: var(--red);
+    }
+
+    .review.mid {
+      border-left-color: var(--amber);
+    }
+
+    .review.good {
+      border-left-color: var(--green);
+    }
+
+    .review-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 9px;
+    }
+
+    .stars {
+      color: var(--amber);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .score {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .score.red {
+      background: rgba(214, 58, 49, 0.1);
+      color: var(--red);
+    }
+
+    .score.amber {
+      background: rgba(196, 127, 0, 0.1);
+      color: var(--amber);
+    }
+
+    .score.green {
+      background: rgba(6, 199, 85, 0.1);
+      color: #047c38;
+    }
+
+    .quote {
+      margin: 0 0 10px;
+      color: #393632;
+      font-size: 15px;
+      font-style: italic;
+      line-height: 1.48;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--faint);
+      font-size: 11px;
+    }
+
+    .just-now {
+      color: var(--red);
+      font-weight: 500;
+    }
+
+    .automation-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .engine,
+    .line-card,
+    .mail-card {
+      padding: 18px;
+      min-height: 356px;
+    }
+
+    .mail-card {
+      grid-column: 1 / -1;
+      min-height: auto;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+      margin: 24px 0 22px;
+    }
+
+    .flow-node {
+      min-width: 0;
+      height: 96px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fbfbfa;
+      color: var(--muted);
+      transition: background 240ms ease, border-color 240ms ease, color 240ms ease, transform 240ms ease, box-shadow 240ms ease;
+    }
+
+    .flow-node i {
+      font-size: 24px;
+    }
+
+    .flow-node span {
+      max-width: 100%;
+      padding: 0 5px;
+      font-family: var(--mono);
+      font-size: 11px;
+      text-align: center;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.25;
+    }
+
+    .flow-node.active {
+      transform: translateY(-2px);
+      background: rgba(6, 199, 85, 0.08);
+      border-color: rgba(6, 199, 85, 0.52);
+      color: #047c38;
+      box-shadow: 0 8px 20px rgba(6, 199, 85, 0.12);
+    }
+
+    .flow-node[data-color="booking"].active {
+      background: rgba(0, 53, 128, 0.08);
+      border-color: rgba(0, 53, 128, 0.42);
+      color: var(--booking);
+      box-shadow: 0 8px 20px rgba(0, 53, 128, 0.12);
+    }
+
+    .flow-node[data-color="agoda"].active {
+      background: rgba(232, 55, 59, 0.08);
+      border-color: rgba(232, 55, 59, 0.42);
+      color: var(--agoda);
+      box-shadow: 0 8px 20px rgba(232, 55, 59, 0.12);
+    }
+
+    .flow-node[data-color="kodai"].active {
+      background: rgba(108, 92, 231, 0.1);
+      border-color: rgba(108, 92, 231, 0.5);
+      color: var(--purple);
+      box-shadow: 0 8px 20px rgba(108, 92, 231, 0.13);
+    }
+
+    .flow-node[data-color="gmail"].active {
+      background: rgba(214, 58, 49, 0.08);
+      border-color: rgba(214, 58, 49, 0.42);
+      color: var(--red);
+      box-shadow: 0 8px 20px rgba(214, 58, 49, 0.12);
+    }
+
+    .flow-arrow {
+      color: var(--faint);
+      font-size: 18px;
+    }
+
+    .status-line {
+      min-height: 20px;
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      transition: color 180ms ease;
+    }
+
+    .status-line.done {
+      color: #047c38;
+    }
+
+    .fire-button {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(214, 58, 49, 0.18);
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+    }
+
+    .fire-button:hover:not(:disabled) {
+      background: #bf3129;
+    }
+
+    .fire-button.fired {
+      background: var(--green);
+      box-shadow: 0 10px 20px rgba(6, 199, 85, 0.18);
+    }
+
+    .fire-button:disabled {
+      cursor: default;
+    }
+
+    .chat {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .bubble {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 360ms ease, transform 360ms ease;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fbfbfa;
+    }
+
+    .bubble.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .bubble-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .sender {
+      color: #047c38;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .timestamp {
+      color: var(--faint);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .alert-detail {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 11px;
+      color: #34312e;
+      font-size: 14px;
+    }
+
+    .alert-detail strong {
+      font-weight: 500;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .tag {
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .tag.red {
+      background: rgba(214, 58, 49, 0.1);
+      color: var(--red);
+    }
+
+    .tag.amber {
+      background: rgba(196, 127, 0, 0.11);
+      color: var(--amber);
+    }
+
+    .draft {
+      margin: 0 0 12px;
+      padding: 12px 12px 12px 14px;
+      border-left: 4px solid var(--purple);
+      border-radius: 7px;
+      background: rgba(108, 92, 231, 0.06);
+      color: #34312e;
+      font-size: 14px;
+      font-style: italic;
+      line-height: 1.52;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .action-button {
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 11px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .action-button.primary {
+      border-color: rgba(6, 199, 85, 0.26);
+      background: rgba(6, 199, 85, 0.1);
+      color: #047c38;
+    }
+
+    .action-button:hover:not(:disabled) {
+      border-color: rgba(0, 0, 0, 0.18);
+      background: #f6f6f4;
+    }
+
+    .action-button.assigned,
+    .action-button.sent {
+      border-color: rgba(0, 0, 0, 0.06);
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--muted);
+      cursor: default;
+    }
+
+    .gmail-shell {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .gmail-sidebar {
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fbfbfa;
+    }
+
+    .gmail-logo,
+    .gmail-folder,
+    .gmail-toolbar,
+    .email-head {
+      display: flex;
+      align-items: center;
+    }
+
+    .gmail-logo {
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--red);
+      font-weight: 500;
+    }
+
+    .gmail-folder {
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 9px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .gmail-folder.active {
+      background: rgba(214, 58, 49, 0.1);
+      color: var(--red);
+    }
+
+    .gmail-main {
+      min-width: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .gmail-toolbar {
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 42px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fbfbfa;
+    }
+
+    .gmail-search {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .email-card {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 360ms ease, transform 360ms ease;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .email-card.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .mail-to {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .email-card {
+      padding: 14px;
+    }
+
+    .email-head {
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .sender.purple {
+      color: var(--purple);
+    }
+
+    .email-subject {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 500;
+    }
+
+    .email-draft,
+    .email-alert {
+      margin: 0 0 12px;
+      color: #34312e;
+      font-size: 14px;
+      line-height: 1.58;
+    }
+
+    .email-alert {
+      display: grid;
+      gap: 7px;
+    }
+
+    .email-alert p {
+      margin: 0;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 30;
+      opacity: 0;
+      transform: translate(-50%, 14px);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #1f1f1f;
+      color: #fff;
+      box-shadow: 0 14px 38px rgba(0, 0, 0, 0.2);
+      font-family: var(--mono);
+      font-size: 12px;
+      pointer-events: none;
+      transition: opacity 220ms ease, transform 220ms ease;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .footer {
+      margin-top: 34px;
+      text-align: center;
+      color: var(--faint);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(6, 199, 85, 0.42);
+      }
+
+      72% {
+        box-shadow: 0 0 0 8px rgba(6, 199, 85, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(6, 199, 85, 0);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── DATA SECTION ─────────────────────────── */
+    .data-section {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .data-panel {
+      padding: 18px;
+    }
+
+    /* Spreadsheet */
+    .sheet-wrap {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .sheet-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      background: #f0ede8;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .sheet-toolbar i { font-size: 13px; color: #217346; }
+
+    .sheet-tab {
+      padding: 3px 10px;
+      border-radius: 4px 4px 0 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .sheet-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    .sheet-table th {
+      background: #f7f6f3;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      padding: 5px 8px;
+      text-align: left;
+      font-weight: 500;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .sheet-table td {
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      border-right: 1px solid rgba(0,0,0,0.04);
+      padding: 5px 8px;
+      color: var(--text);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .sheet-table tr:last-child td { border-bottom: none; }
+
+    .sheet-row-new td {
+      background: rgba(6, 199, 85, 0.07);
+      animation: rowFlash 1.2s ease both;
+    }
+
+    @keyframes rowFlash {
+      0%   { background: rgba(6,199,85,0.25); }
+      100% { background: rgba(6,199,85,0.07); }
+    }
+
+    .cell-red   { color: var(--red); font-weight: 500; }
+    .cell-amber { color: var(--amber); font-weight: 500; }
+    .cell-green { color: #047c38; font-weight: 500; }
+    .cell-tag {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 20px;
+      font-size: 10px;
+      background: rgba(214,58,49,0.09);
+      color: var(--red);
+      margin-right: 3px;
+    }
+    .cell-tag.amber {
+      background: rgba(196,127,0,0.09);
+      color: var(--amber);
+    }
+
+    .sheet-empty {
+      padding: 28px 16px;
+      text-align: center;
+      color: var(--faint);
+      font-size: 12px;
+      font-family: var(--mono);
+      background: #fff;
+    }
+
+    /* Dashboard */
+    .dash-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fbfbfa;
+    }
+
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--faint);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .stat-value.red   { color: var(--red); }
+    .stat-value.green { color: #047c38; }
+    .stat-delta {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--faint);
+      margin-top: 3px;
+    }
+    .stat-delta.up   { color: #047c38; }
+    .stat-delta.down { color: var(--red); }
+
+    .chart-area {
+      margin-top: 4px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      padding: 14px 14px 8px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 200px;
+      width: 100%;
+    }
+
+    canvas#ratingChart {
+      display: block;
+    }
+
+    .new-entry-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: rgba(6,199,85,0.1);
+      color: #047c38;
+      font-size: 11px;
+      font-family: var(--mono);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .new-entry-badge.show { opacity: 1; }
+
+    @media (max-width: 760px) {
+      .data-section { grid-template-columns: 1fr; }
+      .dash-stats   { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    /* ── END DATA SECTION ─────────────────────── */
+
+    /* ── MOBILE-FIRST RESPONSIVE ─────────────── */
+
+    @media (max-width: 760px) {
+      .page {
+        padding-top: 72px;
+      }
+
+      .automation-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .engine,
+      .line-card,
+      .mail-card {
+        min-height: auto;
+      }
+
+      .gmail-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .gmail-sidebar {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        overflow-x: auto;
+        gap: 6px;
+        padding: 10px 12px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .gmail-sidebar::-webkit-scrollbar { display: none; }
+
+      .gmail-logo {
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-bottom: 0;
+        margin-right: 8px;
+      }
+
+      .gmail-folder {
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+    }
+
+    @media (max-width: 580px) {
+      /* Topbar */
+      .topbar-inner {
+        height: 56px;
+        padding: 0 4px;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .live-badge {
+        font-size: 11px;
+        padding: 0 8px;
+        gap: 6px;
+      }
+
+      /* Page layout */
+      .page {
+        width: calc(100% - 24px);
+        padding-top: 68px;
+        padding-bottom: 40px;
+      }
+
+      /* Hero */
+      .hero {
+        margin-bottom: 32px;
+      }
+
+      h1 {
+        font-size: clamp(28px, 9vw, 42px);
+        line-height: 1.05;
+      }
+
+      .subtitle {
+        font-size: 15px;
+        margin-top: 14px;
+      }
+
+      /* Section titles */
+      h2 {
+        font-size: 16px;
+      }
+
+      .section-title {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      /* Reviews */
+      .review-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .platform-card {
+        padding: 14px;
+      }
+
+      .quote {
+        font-size: 14px;
+      }
+
+      /* Flow diagram — vertical on mobile */
+      .flow {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        margin: 18px 0 16px;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+        justify-self: center;
+        font-size: 16px;
+      }
+
+      .flow-node {
+        height: 68px;
+        flex-direction: row;
+        gap: 10px;
+        padding: 0 14px;
+        justify-content: flex-start;
+      }
+
+      .flow-node i {
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .flow-node span {
+        text-align: left;
+        font-size: 12px;
+        padding: 0;
+      }
+
+      /* Engine card */
+      .engine {
+        padding: 14px;
+      }
+
+      .status-line {
+        font-size: 12px;
+        word-break: break-all;
+      }
+
+      .fire-button {
+        font-size: 14px;
+        min-height: 48px;
+      }
+
+      /* LINE card */
+      .line-card {
+        padding: 14px;
+      }
+
+      .bubble {
+        padding: 12px;
+      }
+
+      .bubble-head,
+      .email-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .tag-row {
+        gap: 5px;
+      }
+
+      .tag {
+        font-size: 10px;
+        padding: 4px 7px;
+      }
+
+      .actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .action-button {
+        width: 100%;
+        min-height: 42px;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+
+      /* Gmail */
+      .mail-card {
+        padding: 14px;
+      }
+
+      .gmail-shell {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .gmail-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        min-height: auto;
+        padding: 10px 12px;
+      }
+
+      .email-head {
+        margin-bottom: 10px;
+      }
+
+      .email-subject {
+        font-size: 13px;
+      }
+
+      .mail-to {
+        font-size: 12px;
+      }
+
+      /* Timestamp */
+      .timestamp {
+        white-space: normal;
+        font-size: 11px;
+      }
+
+      /* Data section */
+      .data-panel {
+        padding: 14px;
+      }
+
+      /* Spreadsheet — horizontal scroll on mobile */
+      .sheet-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .sheet-table {
+        min-width: 560px;
+      }
+
+      /* Dashboard stats — 3 equal columns */
+      .dash-stats {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 6px;
+      }
+
+      .stat-card {
+        padding: 8px 10px;
+      }
+
+      .stat-label {
+        font-size: 9px;
+      }
+
+      .stat-value {
+        font-size: 18px;
+      }
+
+      .stat-delta {
+        font-size: 9px;
+      }
+
+      /* Table — hide less important columns, no horizontal scroll needed */
+      .sheet-wrap {
+        overflow-x: unset;
+      }
+
+      .sheet-table {
+        min-width: unset;
+        width: 100%;
+      }
+
+      .col-time,
+      .col-room,
+      .col-issues {
+        display: none;
+      }
+
+      /* Chart */
+      .chart-canvas-wrap {
+        height: 160px;
+      }
+
+      /* Toast */
+      .toast {
+        width: calc(100% - 32px);
+        text-align: center;
+        white-space: normal;
+        font-size: 12px;
+        bottom: 16px;
+      }
+
+      /* Footer */
+      .footer {
+        margin-top: 24px;
+        font-size: 11px;
+      }
+    }
+
+    /* Extra small — very narrow phones */
+    @media (max-width: 360px) {
+      h1 {
+        font-size: 26px;
+      }
+
+      .dash-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .platform-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="Kodai">
+        <div class="brand-mark"><i class="ti ti-sparkles"></i></div>
+        <span>Kodai</span>
+      </div>
+      <div class="live-badge"><span class="dot"></span>LIVE OTA MONITOR</div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero fade-up">
+      <p class="eyebrow">THAI BOUTIQUE HOTEL AUTOMATION</p>
+      <h1>Kodai watches reviews before they become <strong>reputation</strong> risk.</h1>
+      <p class="subtitle">A lightweight alert workflow for boutique hotel teams in Thailand: detect poor OTA reviews and push urgent alerts into LINE and Gmail.</p>
+    </section>
+
+    <section class="section fade-up delay-1" aria-labelledby="feed-title">
+      <div class="section-title">
+        <h2 id="feed-title">OTA Review Feed</h2>
+        <div class="live-badge"><span class="dot"></span>STREAMING</div>
+      </div>
+      <div class="review-grid">
+        <article class="card platform-card">
+          <div class="platform-head">
+            <div class="platform-name">
+              <div class="platform-icon booking"><i class="ti ti-brand-booking"></i></div>
+              Booking.com
+            </div>
+            <span class="dot" aria-label="live"></span>
+          </div>
+          <div class="review-list">
+            <div class="review bad">
+              <div class="review-top">
+                <div class="stars">★★☆☆☆</div>
+                <span class="score red">4.2/10</span>
+              </div>
+              <p class="quote">"The room smelled damp, staff took too long to respond, and the pool facilities were not ready."</p>
+              <div class="meta">
+                <span>Emma L. · Deluxe Garden Room</span>
+                <span class="just-now">Just now</span>
+              </div>
+            </div>
+            <div class="review good">
+              <div class="review-top">
+                <div class="stars">★★★★★</div>
+                <span class="score green">9.4/10</span>
+              </div>
+              <p class="quote">"Beautiful little hotel, kind breakfast team, and the front desk helped with our island transfer."</p>
+              <div class="meta">
+                <span>Daniel K. · Pool Villa</span>
+                <span>08:42</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card platform-card">
+          <div class="platform-head">
+            <div class="platform-name">
+              <div class="platform-icon agoda"><i class="ti ti-building-skyscraper"></i></div>
+              Agoda
+            </div>
+            <span class="dot" aria-label="live"></span>
+          </div>
+          <div class="review-list">
+            <div class="review mid">
+              <div class="review-top">
+                <div class="stars">★★★☆☆</div>
+                <span class="score amber">6.8/10</span>
+              </div>
+              <p class="quote">"Location is lovely, but breakfast ran out early and the air-con was noisy at night."</p>
+              <div class="meta">
+                <span>Narisa P. · Superior Balcony</span>
+                <span>09:16</span>
+              </div>
+            </div>
+            <div class="review good">
+              <div class="review-top">
+                <div class="stars">★★★★★</div>
+                <span class="score green">9.1/10</span>
+              </div>
+              <p class="quote">"Quiet, stylish, and walkable to the old town. The staff made our anniversary feel special."</p>
+              <div class="meta">
+                <span>Mei W. · Courtyard Suite</span>
+                <span>07:55</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section automation-grid fade-up delay-2" aria-label="Kodai alert workflow">
+      <article class="card engine">
+        <div class="section-title">
+          <h2>Kodai Detection Engine</h2>
+          <div class="live-badge"><span class="dot"></span>ARMED</div>
+        </div>
+
+        <div class="flow" aria-label="OTA alert flow">
+          <div class="flow-node" data-node="booking" data-color="booking">
+            <i class="ti ti-brand-booking"></i>
+            <span>Booking.com</span>
+          </div>
+          <i class="ti ti-arrow-right flow-arrow" aria-hidden="true"></i>
+          <div class="flow-node" data-node="agoda" data-color="agoda">
+            <i class="ti ti-building-skyscraper"></i>
+            <span>Agoda</span>
+          </div>
+          <i class="ti ti-arrow-right flow-arrow" aria-hidden="true"></i>
+          <div class="flow-node" data-node="kodai" data-color="kodai">
+            <i class="ti ti-brain"></i>
+            <span>Kodai</span>
+          </div>
+          <i class="ti ti-arrow-right flow-arrow" aria-hidden="true"></i>
+          <div class="flow-node" data-node="line">
+            <i class="ti ti-message-circle"></i>
+            <span>LINE group</span>
+          </div>
+          <i class="ti ti-arrow-right flow-arrow" aria-hidden="true"></i>
+          <div class="flow-node" data-node="gmail" data-color="gmail">
+            <i class="ti ti-mail"></i>
+            <span>Gmail alert</span>
+          </div>
+        </div>
+
+        <p class="status-line" id="statusLine">waiting_for_trigger · risk_score=high</p>
+        <button class="fire-button" id="fireButton" type="button">
+          <i class="ti ti-bell-ringing"></i>
+          Fire LINE + Gmail alert now
+        </button>
+      </article>
+
+      <article class="card line-card">
+        <div class="section-title">
+          <h2>LINE Management Group</h2>
+          <div class="live-badge"><span class="dot"></span>HOTEL OPS</div>
+        </div>
+
+        <div class="chat">
+          <div class="bubble" id="alertBubble">
+            <div class="bubble-head">
+              <span class="sender">Kodai Alert</span>
+              <span class="timestamp" id="alertTime">--:--</span>
+            </div>
+            <div class="alert-detail">
+              <span><strong>Guest:</strong> Emma L.</span>
+              <span><strong>Score:</strong> <span class="score red">4.2/10</span></span>
+              <span><strong>Review:</strong> <em>"The room smelled damp, staff took too long to respond, and the pool facilities were not ready."</em></span>
+            </div>
+            <div class="tag-row">
+              <span class="tag red">Cleanliness</span>
+              <span class="tag red">Staff responsiveness</span>
+              <span class="tag amber">Facilities</span>
+            </div>
+          </div>
+
+          <div class="bubble" id="draftBubble">
+            <div class="bubble-head">
+              <span class="sender">Kodai - Suggested reply draft</span>
+              <span class="timestamp" id="draftTime">--:--</span>
+            </div>
+            <p class="draft" id="replyDraft">Dear Emma, thank you for taking the time to share this feedback. We are truly sorry the room condition, response time, and pool readiness did not meet your expectations. Our management team is reviewing this today and we would appreciate the chance to follow up directly.</p>
+            <div class="actions">
+              <button class="action-button primary" id="copyButton" type="button">
+                <i class="ti ti-copy"></i>
+                <span>Copy &amp; edit reply</span>
+              </button>
+              <button class="action-button" id="assignButton" type="button">
+                <i class="ti ti-user-check"></i>
+                <span>Assign to GM</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card mail-card">
+        <div class="section-title">
+          <h2>Gmail Alert Inbox</h2>
+          <div class="live-badge"><span class="dot"></span>ALERT READY</div>
+        </div>
+
+        <div class="gmail-shell">
+          <aside class="gmail-sidebar" aria-label="Gmail folders">
+            <div class="gmail-logo"><i class="ti ti-mail"></i> Gmail</div>
+            <div class="gmail-folder active"><i class="ti ti-inbox"></i> Priority</div>
+            <div class="gmail-folder"><i class="ti ti-bell"></i> Alerts</div>
+            <div class="gmail-folder"><i class="ti ti-send"></i> Sent</div>
+          </aside>
+
+          <div class="gmail-main">
+            <div class="gmail-toolbar">
+              <span class="gmail-search"><i class="ti ti-search"></i> ota review alerts</span>
+              <span class="timestamp" id="mailTime">--:--</span>
+            </div>
+
+            <div class="email-card" id="emailCard">
+              <div class="email-head">
+                <div>
+                  <div class="sender purple">Kodai Alert - Gmail</div>
+                  <div class="mail-to">To: gm@boutiquehotel.co.th · Cc: frontoffice@boutiquehotel.co.th</div>
+                </div>
+                <span class="timestamp" id="draftMailTime">--:--</span>
+              </div>
+              <div class="email-subject">Subject: Urgent OTA review alert - Emma L. scored 4.2/10</div>
+              <div class="email-alert" id="emailDraft">
+                <div><strong>Platform:</strong> Booking.com</div>
+                <div><strong>Guest:</strong> Emma L. · Deluxe Garden Room</div>
+                <div><strong>Score:</strong> <span class="score red">4.2/10</span></div>
+                <p><strong>Review:</strong> <em>"The room smelled damp, staff took too long to respond, and the pool facilities were not ready."</em></p>
+                <div class="tag-row">
+                  <span class="tag red">Cleanliness</span>
+                  <span class="tag red">Staff responsiveness</span>
+                  <span class="tag amber">Facilities</span>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="action-button primary" id="copyEmailButton" type="button">
+                  <i class="ti ti-copy"></i>
+                  <span>Copy alert details</span>
+                </button>
+                <button class="action-button" id="sendEmailButton" type="button">
+                  <i class="ti ti-send"></i>
+                  <span>Forward to GM</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- DATA LOG + DASHBOARD SECTION -->
+    <section class="section data-section fade-up delay-3" aria-label="Review log and rating dashboard">
+
+      <!-- LEFT: Spreadsheet log -->
+      <article class="card data-panel">
+        <div class="section-title">
+          <h2>Review log</h2>
+          <span class="new-entry-badge" id="newEntryBadge"><span class="dot"></span> new row added</span>
+        </div>
+
+        <div class="sheet-wrap">
+          <div class="sheet-toolbar">
+            <i class="ti ti-table"></i>
+            <span>kodai_review_log.xlsx</span>
+            <span style="margin-left:auto" class="sheet-tab">Sheet1</span>
+          </div>
+          <div id="sheetEmpty" class="sheet-empty">
+            Waiting for alert to fire — rows will appear here
+          </div>
+          <table class="sheet-table" id="sheetTable" style="display:none">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th class="col-time">Time</th>
+                <th>Platform</th>
+                <th>Guest</th>
+                <th class="col-room">Room</th>
+                <th>Score</th>
+                <th class="col-issues">Issues</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="sheetBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <!-- RIGHT: Dashboard -->
+      <article class="card data-panel">
+        <div class="section-title">
+          <h2>Rating trend dashboard</h2>
+          <div class="live-badge"><span class="dot"></span>LAST 30 DAYS</div>
+        </div>
+
+        <div class="dash-stats">
+          <div class="stat-card">
+            <div class="stat-label">Booking.com avg</div>
+            <div class="stat-value" id="statBooking">7.6</div>
+            <div class="stat-delta down" id="deltaBooking">▼ 0.4 this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Agoda avg</div>
+            <div class="stat-value" id="statAgoda">7.9</div>
+            <div class="stat-delta up" id="deltaAgoda">▲ 0.1 this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Alerts fired</div>
+            <div class="stat-value red" id="statAlerts">0</div>
+            <div class="stat-delta" id="deltaAlerts">this session</div>
+          </div>
+        </div>
+
+        <div class="chart-area">
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#003580"></div>Booking.com</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#e8373b"></div>Agoda</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#d63a31;opacity:0.35;border-radius:2px;width:12px;height:4px;margin-top:2px"></div>Alert threshold (7.0)</div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="ratingChart"></canvas>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <footer class="footer fade-up delay-3">
+      <div>Kodai · AI &amp; Automation for Thai Boutique Hotels</div>
+      <div>Demo only — not connected to live OTA data</div>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Ready</div>
+
+  <script>
+    const fireButton = document.getElementById("fireButton");
+    const statusLine = document.getElementById("statusLine");
+    const flowNodes = Array.from(document.querySelectorAll(".flow-node"));
+    const alertBubble = document.getElementById("alertBubble");
+    const draftBubble = document.getElementById("draftBubble");
+    const emailCard = document.getElementById("emailCard");
+    const alertTime = document.getElementById("alertTime");
+    const draftTime = document.getElementById("draftTime");
+    const mailTime = document.getElementById("mailTime");
+    const draftMailTime = document.getElementById("draftMailTime");
+    const toast = document.getElementById("toast");
+    const copyButton = document.getElementById("copyButton");
+    const copyEmailButton = document.getElementById("copyEmailButton");
+    const assignButton = document.getElementById("assignButton");
+    const sendEmailButton = document.getElementById("sendEmailButton");
+    const replyDraft = document.getElementById("replyDraft");
+    const emailDraft = document.getElementById("emailDraft");
+
+    let fired = false;
+    let toastTimer;
+
+    function currentTime() {
+      return new Intl.DateTimeFormat("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).format(new Date());
+    }
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("show");
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2400);
+    }
+
+    function fallbackCopyText(text) {
+      let eventCopied = false;
+      const handleCopy = (event) => {
+        if (event.clipboardData) {
+          event.clipboardData.setData("text/plain", text);
+          event.preventDefault();
+          eventCopied = true;
+        }
+      };
+
+      document.addEventListener("copy", handleCopy);
+      let eventCommandCopied = false;
+      try {
+        eventCommandCopied = document.execCommand("copy");
+      } catch (error) {
+        eventCommandCopied = false;
+      }
+      document.removeEventListener("copy", handleCopy);
+
+      if (eventCommandCopied || eventCopied) {
+        return;
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "0";
+      document.body.appendChild(textarea);
+      textarea.focus({ preventScroll: true });
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+      let copied = false;
+      try {
+        copied = document.execCommand("copy");
+      } catch (error) {
+        copied = false;
+      }
+      document.body.removeChild(textarea);
+
+      if (!copied) {
+        throw new Error("Clipboard copy failed");
+      }
+    }
+
+    async function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return;
+        } catch (error) {
+          fallbackCopyText(text);
+          return;
+        }
+      }
+
+      fallbackCopyText(text);
+    }
+
+    function schedule(delay, callback) {
+      window.setTimeout(callback, delay);
+    }
+
+    fireButton.addEventListener("click", () => {
+      if (fired) return;
+      fired = true;
+      fireButton.disabled = true;
+      statusLine.textContent = "trigger_received · scanning OTA payload";
+
+      schedule(350, () => {
+        flowNodes[0].classList.add("active");
+        statusLine.textContent = "booking_review_ingested · score=4.2";
+      });
+
+      schedule(950, () => {
+        flowNodes[1].classList.add("active");
+        statusLine.textContent = "agoda_feed_checked · duplicate=false";
+      });
+
+      schedule(1550, () => {
+        flowNodes[2].classList.add("active");
+        statusLine.textContent = "kodai_detection · tags=cleanliness,staff,facilities";
+      });
+
+      schedule(2100, () => {
+        flowNodes[3].classList.add("active");
+        statusLine.textContent = "line_delivery · management_group=sent";
+      });
+
+      schedule(2350, () => {
+        flowNodes[4].classList.add("active");
+        statusLine.textContent = "✓ Alert fired";
+        statusLine.classList.add("done");
+        fireButton.classList.add("fired");
+        fireButton.innerHTML = '<i class="ti ti-check"></i> Alert fired';
+      });
+
+      schedule(2400, () => {
+        alertTime.textContent = currentTime();
+        alertBubble.classList.add("show");
+      });
+
+      schedule(3300, () => {
+        draftTime.textContent = currentTime();
+        draftBubble.classList.add("show");
+      });
+
+      schedule(2850, () => {
+        mailTime.textContent = currentTime();
+        draftMailTime.textContent = currentTime();
+        emailCard.classList.add("show");
+      });
+    });
+
+    copyButton.addEventListener("click", async () => {
+      const label = copyButton.querySelector("span");
+      try {
+        await copyText(replyDraft.textContent.trim());
+        label.textContent = "Copied!";
+        showToast("✓ Reply copied to clipboard");
+        setTimeout(() => {
+          label.textContent = "Copy & edit reply";
+        }, 1400);
+      } catch (error) {
+        showToast("Copy failed - select the draft manually");
+      }
+    });
+
+    assignButton.addEventListener("click", () => {
+      assignButton.classList.add("assigned");
+      assignButton.disabled = true;
+      assignButton.innerHTML = '<i class="ti ti-user-check"></i><span>Assigned to Khun Ploy</span>';
+      showToast("✓ Assigned to GM — Khun Ploy");
+    });
+
+    copyEmailButton.addEventListener("click", async () => {
+      const label = copyEmailButton.querySelector("span");
+      try {
+        await copyText(emailDraft.textContent.trim());
+        label.textContent = "Copied!";
+        showToast("✓ Email alert copied");
+        setTimeout(() => {
+          label.textContent = "Copy alert details";
+        }, 1400);
+      } catch (error) {
+        showToast("Copy failed - select the alert manually");
+      }
+    });
+
+    sendEmailButton.addEventListener("click", () => {
+      sendEmailButton.classList.add("sent");
+      sendEmailButton.disabled = true;
+      sendEmailButton.innerHTML = '<i class="ti ti-user-check"></i><span>Forwarded to GM</span>';
+      showToast("✓ Forwarded to GM");
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script>
+    /* ── SPREADSHEET + DASHBOARD LOGIC ───────── */
+
+    const sheetEmpty  = document.getElementById('sheetEmpty');
+    const sheetTable  = document.getElementById('sheetTable');
+    const sheetBody   = document.getElementById('sheetBody');
+    const newEntryBadge = document.getElementById('newEntryBadge');
+    const statBooking = document.getElementById('statBooking');
+    const statAgoda   = document.getElementById('statAgoda');
+    const statAlerts  = document.getElementById('statAlerts');
+    const deltaBooking= document.getElementById('deltaBooking');
+
+    /* Seed data — last 6 weeks of ratings */
+    const labels = ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6 (now)'];
+    const bookingData = [8.1, 7.8, 7.9, 7.5, 7.6, 7.6];
+    const agodaData   = [8.3, 8.1, 7.9, 8.0, 7.8, 7.9];
+
+    /* Existing sheet rows (seed data) */
+    const seedRows = [
+      { platform:'Booking.com', guest:'Daniel K.',  room:'Pool Villa',        score:9.4, issues:[],                      status:'Logged',  date:'Jun 06', time:'08:42' },
+      { platform:'Agoda',       guest:'Mei W.',     room:'Courtyard Suite',   score:9.1, issues:[],                      status:'Logged',  date:'Jun 06', time:'07:55' },
+      { platform:'Agoda',       guest:'Narisa P.',  room:'Superior Balcony',  score:6.8, issues:['Breakfast','Air-con'],  status:'Alerted', date:'Jun 06', time:'09:16' },
+    ];
+
+    let alertsFired = 0;
+    let chartInstance;
+
+    function scoreClass(s) {
+      if (s < 6)  return 'cell-red';
+      if (s < 7.5) return 'cell-amber';
+      return 'cell-green';
+    }
+
+    function renderRow(row, idx, isNew) {
+      const tr = document.createElement('tr');
+      if (isNew) tr.className = 'sheet-row-new';
+      const issueHtml = row.issues.map(i =>
+        `<span class="cell-tag ${i==='Facilities'?'amber':''}">${i}</span>`
+      ).join('');
+      tr.innerHTML = `
+        <td style="color:var(--faint)">${idx}</td>
+        <td>${row.date}</td>
+        <td class="col-time">${row.time}</td>
+        <td><strong>${row.platform}</strong></td>
+        <td>${row.guest}</td>
+        <td class="col-room">${row.room}</td>
+        <td class="${scoreClass(row.score)}">${row.score}/10</td>
+        <td class="col-issues">${issueHtml || '<span style="color:var(--faint)">—</span>'}</td>
+        <td><span class="cell-tag ${row.status==='Alerted'?'':'amber'}" style="${row.status==='Logged'?'background:rgba(6,199,85,0.09);color:#047c38':''}">${row.status}</span></td>
+      `;
+      return tr;
+    }
+
+    function initSheet() {
+      sheetEmpty.style.display = 'none';
+      sheetTable.style.display = 'table';
+      sheetBody.innerHTML = '';
+      seedRows.forEach((r, i) => {
+        sheetBody.appendChild(renderRow(r, i + 1, false));
+      });
+    }
+
+    function addNewRow(time) {
+      const newRow = {
+        platform: 'Booking.com',
+        guest:    'Emma L.',
+        room:     'Deluxe Garden Room',
+        score:    4.2,
+        issues:   ['Cleanliness','Staff','Facilities'],
+        status:   'Alerted',
+        date:     'Jun 06',
+        time:     time
+      };
+      const idx = sheetBody.querySelectorAll('tr').length + 1;
+      const tr = renderRow(newRow, idx, true);
+      sheetBody.insertBefore(tr, sheetBody.firstChild);
+
+      newEntryBadge.classList.add('show');
+      setTimeout(() => newEntryBadge.classList.remove('show'), 3000);
+    }
+
+    /* Chart */
+    function buildChart(highlightDrop) {
+      const canvas = document.getElementById('ratingChart');
+      const ctx = canvas.getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      const bPointColors = bookingData.map((v, i) =>
+        (highlightDrop && i === bookingData.length - 1) ? '#d63a31' : '#003580'
+      );
+      const bPointSizes = bookingData.map((v, i) =>
+        (highlightDrop && i === bookingData.length - 1) ? 7 : 4
+      );
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Booking.com',
+              data: bookingData,
+              borderColor: '#003580',
+              backgroundColor: 'rgba(0,53,128,0.07)',
+              pointBackgroundColor: bPointColors,
+              pointRadius: bPointSizes,
+              pointHoverRadius: 6,
+              tension: 0.35,
+              fill: true,
+              borderWidth: 2,
+            },
+            {
+              label: 'Agoda',
+              data: agodaData,
+              borderColor: '#e8373b',
+              backgroundColor: 'rgba(232,55,59,0.05)',
+              pointBackgroundColor: '#e8373b',
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              tension: 0.35,
+              fill: true,
+              borderWidth: 2,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 600 },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}/10`
+              }
+            }
+          },
+          scales: {
+            y: {
+              min: 4,
+              max: 10,
+              ticks: {
+                font: { family: "'DM Mono', monospace", size: 10 },
+                color: '#908c84',
+                stepSize: 1,
+                callback: v => v + '.0'
+              },
+              grid: { color: 'rgba(0,0,0,0.05)' }
+            },
+            x: {
+              ticks: {
+                font: { family: "'DM Mono', monospace", size: 10 },
+                color: '#908c84'
+              },
+              grid: { display: false }
+            }
+          }
+        },
+        plugins: [{
+          id: 'threshold',
+          beforeDraw(chart) {
+            const { ctx: c, chartArea, scales: { y } } = chart;
+            if (!chartArea) return;
+            const yPos = y.getPixelForValue(7.0);
+            c.save();
+            c.setLineDash([5, 5]);
+            c.strokeStyle = 'rgba(214,58,49,0.4)';
+            c.lineWidth = 1.5;
+            c.beginPath();
+            c.moveTo(chartArea.left, yPos);
+            c.lineTo(chartArea.right, yPos);
+            c.stroke();
+            c.restore();
+          }
+        }]
+      });
+    }
+
+    /* Init chart after DOM paint so container has real dimensions */
+    requestAnimationFrame(() => {
+      setTimeout(() => buildChart(false), 50);
+    });
+
+    /* Hook into the existing fire button */
+    document.getElementById('fireButton').addEventListener('click', () => {
+      /* Delayed to sync with existing animation (~2.4s) */
+      setTimeout(() => {
+        const t = new Intl.DateTimeFormat('en-GB', { hour:'2-digit', minute:'2-digit', hour12:false }).format(new Date());
+
+        /* Show sheet */
+        initSheet();
+        setTimeout(() => addNewRow(t), 600);
+
+        /* Update stats */
+        alertsFired++;
+        statAlerts.textContent = alertsFired;
+
+        /* Drop Booking.com score to reflect new bad review */
+        bookingData[bookingData.length - 1] = 6.8;
+        statBooking.textContent = '6.8';
+        deltaBooking.textContent = '▼ 0.8 this week';
+        deltaBooking.className = 'stat-delta down';
+
+        /* Rebuild chart with red highlight on latest point */
+        buildChart(true);
+
+      }, 2500);
+    }, { once: true });
+
+  </script>
+</body>
+</html>
